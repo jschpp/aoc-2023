@@ -43,15 +43,14 @@ const NEEDLE: [&str; 18] = [
 fn parse_line(line: &str) -> u32 {
     let (_, left) = NEEDLE
         .iter()
-        .map(|needle| {
+        .filter_map(|needle| {
             let matches: Vec<(usize, &str)> = line.match_indices(needle).collect();
-            if matches.len() > 0 {
+            if !matches.is_empty() {
                 Some(matches[0])
             } else {
                 None
             }
         })
-        .filter_map(|x| x)
         .min_by_key(|x| x.0)
         .context("Finding first number")
         .expect("there should be at least one number");
@@ -60,15 +59,14 @@ fn parse_line(line: &str) -> u32 {
     // since the words can be overlapping a rmatch is needed to find the last number
     let (_, right) = NEEDLE
         .iter()
-        .map(|needle| {
+        .filter_map(|needle| {
             let matches: Vec<(usize, &str)> = line.rmatch_indices(needle).collect();
-            if matches.len() > 0 {
+            if !matches.is_empty() {
                 Some(matches[0])
             } else {
                 None
             }
         })
-        .filter_map(|x| x)
         .max_by_key(|x| x.0)
         .context("Finding last number")
         .expect("there should be at least one number");
@@ -77,11 +75,7 @@ fn parse_line(line: &str) -> u32 {
 }
 
 pub fn process_part2(input: &str) -> Result<String> {
-    Ok(input
-        .lines()
-        .map(|line| parse_line(line))
-        .sum::<u32>()
-        .to_string())
+    Ok(input.lines().map(parse_line).sum::<u32>().to_string())
 }
 
 #[cfg(test)]
@@ -117,5 +111,11 @@ zoneight234
 eighthree";
         let result = "364";
         assert_eq!(process_part2(input2).unwrap(), result)
+    }
+
+    #[test]
+    fn test_part_2_real_data() {
+        let data = include_str!("../input.txt");
+        assert_eq!(process_part2(data).unwrap(), "53389")
     }
 }
