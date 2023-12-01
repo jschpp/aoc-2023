@@ -62,11 +62,6 @@ pub fn process(input: &str) -> Result<String> {
 mod tests {
     use super::*;
 
-    const INPUT: &str = "1abc2
-pqr3stu8vwx
-a1b2c3d4e5f
-treb7uchet";
-
     #[test]
     fn test_part_2() {
         let input2 = "two1nine
