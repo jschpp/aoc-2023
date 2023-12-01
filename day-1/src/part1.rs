@@ -1,5 +1,4 @@
-use anyhow::{Context, Result};
-use nom::{branch::alt, bytes::complete::tag, combinator::value, IResult};
+use anyhow::Result;
 
 pub fn process(input: &str) -> Result<String> {
     let mut sum: u32 = 0;
