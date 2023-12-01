@@ -54,7 +54,7 @@ fn parse_line(line: &str) -> u32 {
     left * 10 + right
 }
 
-pub fn process_part2(input: &str) -> Result<String> {
+pub fn process(input: &str) -> Result<String> {
     Ok(input.lines().map(parse_line).sum::<u32>().to_string())
 }
 
@@ -78,12 +78,12 @@ zoneight234
 7pqrstsixteen
 eighthree";
         let result = "364";
-        assert_eq!(process_part2(input2).unwrap(), result)
+        assert_eq!(process(input2).unwrap(), result)
     }
 
     #[test]
     fn test_part_2_real_data() {
         let data = include_str!("../input.txt");
-        assert_eq!(process_part2(data).unwrap(), "53389")
+        assert_eq!(process(data).unwrap(), "53389")
     }
 }

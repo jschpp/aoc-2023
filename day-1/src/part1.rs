@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use nom::{branch::alt, bytes::complete::tag, combinator::value, IResult};
 
-pub fn process_part1(input: &str) -> Result<String> {
+pub fn process(input: &str) -> Result<String> {
     let mut sum: u32 = 0;
     input.lines().for_each(|line| {
         let result = [
@@ -33,12 +33,12 @@ treb7uchet";
     #[test]
     fn test_part_1() {
         let result = "142";
-        assert_eq!(process_part1(INPUT).unwrap(), result)
+        assert_eq!(process(INPUT).unwrap(), result)
     }
 
     #[test]
     fn test_part_1_real_data() {
         let data = include_str!("../input.txt");
-        assert_eq!(process_part1(data).unwrap(), "54338")
+        assert_eq!(process(data).unwrap(), "54338")
     }
 }
