@@ -17,7 +17,6 @@ pub fn process(input: &str) -> anyhow::Result<String> {
             game.initialize_max();
             game.max.power()
         })
-        .inspect(|x| println!("{:?}", x))
         .sum();
     Ok(result.to_string())
 }
