@@ -1,7 +1,7 @@
 use super::my_parser::{line_parser, CharPart, Parts, ValuePart};
 
 impl ValuePart {
-    fn touches(&self, other: &[CharPart]) -> bool {
+    pub fn touches(&self, other: &[CharPart]) -> bool {
         let column_range =
             self.location
                 .column
