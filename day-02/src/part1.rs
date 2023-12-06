@@ -22,7 +22,6 @@ pub fn process(input: &str) -> anyhow::Result<String> {
                 None
             }
         })
-        .inspect(|x| println!("{:?}", x))
         .sum();
 
     Ok(result.to_string())
