@@ -9,6 +9,9 @@ use nom::{
 use std::{cmp::Ordering, collections::BTreeMap};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use tracing::info;
+use tracing_subscriber::fmt;
+use tracing_subscriber::fmt::format::FmtSpan;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum HandType {
@@ -86,8 +89,11 @@ fn hand_type(cards: [Card; 5]) -> HandType {
     }
 }
 
-pub fn permutate_hand(hand: &Hand) -> Vec<Hand> {
+pub fn permutate_hand(hand: &Hand, seen: &mut BTreeMap<Hand, Hand>) -> Vec<Hand> {
     let mut hands: Vec<Hand> = Vec::new();
+    if seen.contains_key(hand) {
+        return vec![*seen.get(hand).expect("exists")];
+    }
     hands.push(*hand);
     if hand.cards.contains(&Card::CJ) {
         for idx in 0..5 {
@@ -96,15 +102,15 @@ pub fn permutate_hand(hand: &Hand) -> Vec<Hand> {
                     let mut new_cards = hand.cards;
                     new_cards[idx] = card;
                     let new_hand_type = hand_type(new_cards);
-                    // if new_hand_type >= hand.hand_type {
                     let new_hand = Hand {
                         hand_type: new_hand_type,
                         cards: new_cards,
                     };
-                    let new_permutations = permutate_hand(&new_hand);
-                    let new_hand = get_highest_hand(&new_permutations);
-                    hands.push(new_hand);
-                    // }
+                    let new_permutations = permutate_hand(&new_hand, seen);
+                    let new_highest_hand = get_highest_hand(&new_permutations);
+                    hands.push(new_highest_hand.clone());
+                    let entry = seen.entry(new_hand).or_insert(new_highest_hand.clone());
+                    *entry = new_highest_hand.clone();
                 }
             }
         }
@@ -200,9 +206,17 @@ pub fn line_parser(input: &str) -> IResult<&str, Game> {
 pub fn process(input: &str) -> anyhow::Result<String> {
     let (_, mut games): (_, Vec<Game>) = separated_list1(line_ending, line_parser)(input).unwrap();
     // println!("{:?}", games);
+    fmt::fmt()
+        .with_span_events(FmtSpan::CLOSE)
+        .with_target(false)
+        .with_level(false)
+        .init();
+    info!("start mutations");
     games.iter_mut().for_each(|game| {
-        game.hand.hand_type = get_highest_hand(&permutate_hand(&game.hand)).hand_type;
+        game.hand.hand_type =
+            get_highest_hand(&permutate_hand(&game.hand, &mut BTreeMap::new())).hand_type;
     });
+    info!("done mutations");
     games.sort_by(|a, b| a.hand.cmp(&b.hand));
     let result: u32 = games
         .into_iter()
@@ -245,6 +259,14 @@ KK677 28
 KTJJT 220
 QQQJA 483";
         assert_eq!("5905", process(input)?);
+        Ok(())
+    }
+
+    #[test]
+    #[ignore = "sloooooooow"]
+    fn test_complete_input() -> anyhow::Result<()> {
+        let input = include_str!("../input.txt");
+        assert_eq!("250384185", process(input)?);
         Ok(())
     }
 }

@@ -10,3 +10,5 @@ anyhow = { workspace = true }
 nom = { workspace = true }
 strum = { version = "0.25.0", features = ["derive"] }
 strum_macros = "0.25.3"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
