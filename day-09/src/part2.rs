@@ -8,8 +8,10 @@ fn get_next_number(previous_number: Option<i32>, current_number: &i32) -> i32 {
 fn extrapolate(sequences: Vec<Vec<i32>>) -> i32 {
     let mut previous_number: Option<i32> = None;
     sequences.iter().rev().for_each(|s| {
-        let new_number = get_next_number(previous_number, s.first().expect("not empty"));
-        previous_number = Some(new_number);
+        previous_number = Some(get_next_number(
+            previous_number,
+            s.first().expect("not empty"),
+        ));
     });
     previous_number.expect("has value")
 }
@@ -24,7 +26,7 @@ fn create_sequences(numbers: &[i32]) -> Vec<Vec<i32>> {
             break;
         }
         sequences.push(tmp);
-    };
+    }
     sequences
 }
 
