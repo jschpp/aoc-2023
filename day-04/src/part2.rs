@@ -6,18 +6,23 @@ pub fn process(input: &str) -> anyhow::Result<String> {
     let max_cards = cards.len() as u32;
     let mut cards_touched: u32 = 0;
     let mut todo: VecDeque<Card> = cards.clone().into();
+    let winning_count: Vec<u32> = cards
+        .iter()
+        .map(|c| {
+            c.numbers
+                .iter()
+                .filter(|number| c.winning.contains(number))
+                .count() as u32
+        })
+        .collect();
 
-    //TODO: this is horrifically slow... Need to cache this sometime.
+    //TODO: Still slow but getting better
     while !todo.is_empty() {
         let card = todo
             .pop_front()
             .expect("since todo is not yet empty this must succeed");
         cards_touched += 1;
-        let num_correct = card
-            .numbers
-            .iter()
-            .filter(|number| card.winning.contains(number))
-            .count() as u32;
+        let num_correct = winning_count[card.number as usize - 1];
         if num_correct > 0 {
             let r = max_cards.min(card.number + 1)..=max_cards.min(card.number + num_correct);
             // dbg!(&r, card.number);
