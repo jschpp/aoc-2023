@@ -7,4 +7,8 @@ edition = "2021"
 
 [dependencies]
 anyhow = { workspace = true }
+colored = "2.1.0"
 nom = { workspace = true }
+pathfinding = "4.4.0"
+strum = { version = "0.25.0", features = ["derive"] }
+strum_macros = "0.25.3"
