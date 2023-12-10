@@ -113,4 +113,10 @@ L--J.L7...LJS7F-7L7.
 ....L---J.LJ.LJLJ...";
         assert_eq!("8", process(input));
     }
+
+    #[test]
+    fn test_input() {
+        let input = include_str!("../input.txt");
+        assert_eq!("529", process(input));
+    }
 }
