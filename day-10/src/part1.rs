@@ -49,4 +49,10 @@ SJ.L7
 LJ...";
         assert_eq!("8", process(input));
     }
+
+    #[test]
+    fn test_input() {
+        let input = include_str!("../input.txt");
+        assert_eq!("6923", process(input));
+    }
 }
