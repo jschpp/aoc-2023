@@ -14,7 +14,7 @@ impl Flood {
     /// Flips Inside to Outside
     ///
     /// ```
-    /// use day_10::part2::Flood::*;
+    /// use day_10::types::flood::Flood::*;
     /// assert_eq!(Outside, Inside.flip());
     /// assert_eq!(Inside, Outside.flip());
     /// ```
@@ -24,7 +24,7 @@ impl Flood {
     /// Will panic when Flood is a Pipe
     ///
     /// ```rust,should_panic
-    /// use day_10::part2::Flood::*;
+    /// use day_10::types::flood::Flood::*;
     /// // panics
     /// Pipe{x: 'x'}.flip();
     /// ```
