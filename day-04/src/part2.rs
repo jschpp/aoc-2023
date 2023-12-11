@@ -1,38 +1,20 @@
 use super::my_parser::*;
-use std::collections::VecDeque;
 
 pub fn process(input: &str) -> anyhow::Result<String> {
     let (_input, cards) = my_parser(input).unwrap();
-    let max_cards = cards.len() as u32;
-    let mut cards_touched: u32 = 0;
-    let mut todo: VecDeque<Card> = cards.clone().into();
-    let winning_count: Vec<u32> = cards
-        .iter()
-        .map(|c| {
-            c.numbers
-                .iter()
-                .filter(|number| c.winning.contains(number))
-                .count() as u32
-        })
-        .collect();
-
-    //TODO: Still slow but getting better
-    while !todo.is_empty() {
-        let card = todo
-            .pop_front()
-            .expect("since todo is not yet empty this must succeed");
-        cards_touched += 1;
-        let num_correct = winning_count[card.number as usize - 1];
-        if num_correct > 0 {
-            let r = max_cards.min(card.number + 1)..=max_cards.min(card.number + num_correct);
-            // dbg!(&r, card.number);
-            cards
-                .iter()
-                .filter(|x| r.contains(&x.number))
-                .for_each(|x| todo.push_back(x.clone()));
+    let max_cards = cards.len();
+    let mut played: Vec<usize> = vec![1; max_cards];
+    for (card_idx, card) in cards.iter().enumerate() {
+        let winning_count: usize = card
+            .numbers
+            .iter()
+            .filter(|number| card.winning.contains(number))
+            .count();
+        for future_idx in (card_idx+1)..=max_cards.min(winning_count + card_idx) {
+            played[future_idx] += played[card_idx];
         }
     }
-    Ok(cards_touched.to_string())
+    Ok(played.iter().sum::<usize>().to_string())
 }
 
 #[cfg(test)]
@@ -49,6 +31,13 @@ Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
 Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 ";
         assert_eq!("30", process(input)?);
+        Ok(())
+    }
+
+    #[test]
+    fn test_input() -> anyhow::Result<()> {
+        let input = include_str!("../input.txt");
+        assert_eq!("5037841", process(input)?);
         Ok(())
     }
 }
