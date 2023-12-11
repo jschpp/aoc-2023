@@ -1,4 +1,3 @@
-#![feature(iter_array_chunks)]
 use day_05::part2::process;
 use anyhow::Context;
 

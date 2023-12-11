@@ -4,10 +4,8 @@ pub fn process(input: &str) -> anyhow::Result<String> {
     let (_, almanac) = almanac_parser(input).unwrap();
     let result = almanac
         .seeds
-        .iter()
-        .array_chunks::<2>()
-        .map(|arr| (arr[0].to_owned()..arr[0].to_owned() + arr[1].to_owned()).into_iter())
-        .flatten()
+        .chunks(2)
+        .flat_map(|arr| arr[0]..(arr[0] + arr[1]))
         .map(|seed| mapping(seed, &almanac.seed_to_soil))
         .map(|soil| mapping(soil, &almanac.soil_to_fertilizer))
         .map(|fertilizer| mapping(fertilizer, &almanac.fertilizer_to_water))
