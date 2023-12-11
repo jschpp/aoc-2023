@@ -1,6 +1,6 @@
 use crate::my_parser::{almanac_parser, MapData};
 
-pub fn mapping(num: u64, map: &Vec<MapData>) -> u64 {
+pub fn mapping(num: u64, map: &[MapData]) -> u64 {
     let mut found: u64 = num;
     for data in map.iter() {
         if data.source_start <= num && num < (data.source_start + data.len) {
