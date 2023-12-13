@@ -72,20 +72,18 @@ pub fn find_symmetry_fold(block: &[String], number_of_smudges: usize) -> usize {
         let above = &block[..x];
         let below = &block[x..];
 
-        if below
-            .iter()
-            .zip(above.iter().rev())
-            .fold(0, |line_acc: usize, lines| {
+        if below.iter().zip(above.iter().rev()).fold(
+            0,
+            |line_acc: usize, (below_line, above_line)| {
                 line_acc
-                    + lines
-                        .0
-                        .chars()
-                        .zip(lines.1.chars())
-                        .fold(0, |acc: usize, chars| {
-                            acc + (if chars.0 == chars.1 { 0 } else { 1 })
-                        })
-            })
-            == number_of_smudges
+                    + below_line.chars().zip(above_line.chars()).fold(
+                        0,
+                        |acc: usize, (below_char, above_char)| {
+                            acc + (if below_char == above_char { 0 } else { 1 })
+                        },
+                    )
+            },
+        ) == number_of_smudges
         {
             return x;
         }
