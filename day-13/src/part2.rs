@@ -9,9 +9,9 @@ pub fn process(input: &str) -> String {
         result += find_symmetry(block, 1) * 100;
 
         // columns
-        let new_block = rotate(block);
+        let block = rotate(block);
         // dbg!("rotated block", &new_block);
-        result += find_symmetry(&new_block, 1);
+        result += find_symmetry(&block, 1);
     }
     result.to_string()
 }

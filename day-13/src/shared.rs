@@ -1,3 +1,5 @@
+use std::usize;
+
 use nom::{
     character::complete::{line_ending, one_of},
     multi::{many1, separated_list1},
@@ -30,22 +32,60 @@ pub fn rotate(block: &[String]) -> Vec<String> {
 }
 
 pub fn find_symmetry(block: &[String], number_of_smudges: usize) -> usize {
+    find_symmetry_fold(block, number_of_smudges)
+}
+
+pub fn find_symmetry_map(block: &[String], number_of_smudges: usize) -> usize {
     for x in 1..block.len() {
-        let mut above = block[..x].to_vec();
-        above.reverse();
+        let above = &block[..x];
         let below = &block[x..];
 
-        if below.iter().zip(above.clone())
-        // at this point we have tuples of (row_x, row_y) for each row above & below
-        .map(|(x, y)| {
-            // for each line check each chars
-            x.chars()
-                .zip(y.chars())
-                .map(|(c1, c2)| if c1 == c2 { 0 } else { 1 })
-                .sum::<usize>() // number of mismatches between row x and row y
-        })
-        .sum::<usize>() // number of all mismatches 
-        == number_of_smudges
+        if below
+            .iter()
+            .zip(above.iter().rev())
+            .map(|(row_below, row_above)| {
+                row_below
+                    .chars()
+                    .zip(row_above.chars())
+                    .map(
+                        |(below_char, above_char)| {
+                            if below_char == above_char {
+                                0
+                            } else {
+                                1
+                            }
+                        },
+                    )
+                    .sum::<usize>()
+            })
+            .sum::<usize>()
+            == number_of_smudges
+        {
+            return x;
+        }
+    }
+    0
+}
+
+pub fn find_symmetry_fold(block: &[String], number_of_smudges: usize) -> usize {
+    for x in 1..block.len() {
+        let above = &block[..x];
+        let below = &block[x..];
+
+        if below
+            .iter()
+            .zip(above.iter().rev())
+            .fold(0, |line_acc: usize, lines| {
+                line_acc
+                    + lines
+                        .0
+                        .chars()
+                        .zip(lines.1.chars())
+                        .fold(0, |acc: usize, chars| {
+                            acc + (if chars.0 == chars.1 { 0 } else { 1 })
+                        })
+            })
+            == number_of_smudges
         {
             return x;
         }
