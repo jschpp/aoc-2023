@@ -43,9 +43,9 @@ pub fn count(input: String, nums: Vec<usize>) -> usize {
         )
     {
         result += count(
-                // skipping nums[0] + 1 tokens will either
-                // skip the beginning of the next block as to not open a new one when parsing a dot
-                // empty the existing slice in the case of nums[0] == input.len()
+            // skipping nums[0] + 1 tokens will either
+            // skip the beginning of the next block as to not open a new one when parsing a dot
+            // empty the existing slice in the case of nums[0] == input.len()
             input.chars().skip(nums[0] + 1).collect::<String>(),
             nums[1..].to_vec(),
         );
@@ -97,8 +97,8 @@ pub fn process(input: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use rstest::rstest;
     use super::*;
+    use rstest::rstest;
 
     #[test]
     fn test_unfold() {
@@ -112,8 +112,6 @@ mod tests {
         assert_eq!(".#?.#?.#?.#?.# 1,1,1,1,1", unfold(input));
     }
 
-
-    
     #[rstest]
     #[case("???.### 1,1,3", "1")]
     #[case(".??..??...?##. 1,1,3", "16384")]

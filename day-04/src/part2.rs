@@ -10,7 +10,7 @@ pub fn process(input: &str) -> anyhow::Result<String> {
             .iter()
             .filter(|number| card.winning.contains(number))
             .count();
-        for future_idx in (card_idx+1)..=max_cards.min(winning_count + card_idx) {
+        for future_idx in (card_idx + 1)..=max_cards.min(winning_count + card_idx) {
             played[future_idx] += played[card_idx];
         }
     }

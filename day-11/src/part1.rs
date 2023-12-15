@@ -15,7 +15,8 @@ pub struct Galaxy {
 impl Galaxy {
     pub fn distance_to(&self, other: &Self) -> usize {
         (self.position.column_idx as i32 - other.position.column_idx as i32).unsigned_abs() as usize
-            + (self.position.line_idx as i32 - other.position.line_idx as i32).unsigned_abs() as usize
+            + (self.position.line_idx as i32 - other.position.line_idx as i32).unsigned_abs()
+                as usize
     }
 
     pub fn expand(&mut self, empty_lines: &HashSet<usize>, empty_columns: &HashSet<usize>) {
