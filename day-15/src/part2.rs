@@ -188,7 +188,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "noisy"]
     fn test_input() {
         let input = include_str!("../input.txt");
         assert_eq!("303404", process(input));
