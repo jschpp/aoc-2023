@@ -1,5 +1,5 @@
-use day_09::part1::process;
 use anyhow::Context;
+use day_09::part1::process;
 
 fn main() -> anyhow::Result<()> {
     let file = include_str!("../../input.txt");

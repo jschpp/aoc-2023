@@ -1,5 +1,5 @@
-use std::fmt::{Debug, Display};
 use colored::Colorize;
+use std::fmt::{Debug, Display};
 
 use crate::types::shared::{symbol_map, GridLike};
 

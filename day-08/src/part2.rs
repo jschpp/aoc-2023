@@ -9,10 +9,7 @@ pub fn process(input: &str) -> anyhow::Result<String> {
         map.entry(node.name.clone()).or_insert(node);
     }
 
-    let end_node_count = nodes
-        .iter()
-        .filter(|node| node.name.ends_with('Z'))
-        .count();
+    let end_node_count = nodes.iter().filter(|node| node.name.ends_with('Z')).count();
     let mut current_nodes: Vec<Node> = nodes
         .into_iter()
         .filter(|node| node.name.ends_with('A'))

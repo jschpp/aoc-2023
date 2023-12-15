@@ -26,7 +26,6 @@ pub trait GridLike {
     }
 }
 
-
 pub fn symbol_map(symbol: &char) -> char {
     match symbol {
         '-' => '─',

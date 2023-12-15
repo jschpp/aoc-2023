@@ -1,5 +1,5 @@
-use std::collections::BTreeMap;
 use super::shared::*;
+use std::collections::BTreeMap;
 
 pub fn process(input: &str) -> anyhow::Result<String> {
     let (_, (mut moves, nodes)) = my_parser(input).unwrap();

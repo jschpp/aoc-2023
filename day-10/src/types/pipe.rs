@@ -1,4 +1,4 @@
-use std::fmt::{Display, Debug, Error, Formatter};
+use std::fmt::{Debug, Display, Error, Formatter};
 use std::hash::{Hash, Hasher};
 
 use super::coordinates::Coordinate;
