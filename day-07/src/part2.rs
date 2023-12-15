@@ -108,9 +108,9 @@ pub fn permutate_hand(hand: &Hand, seen: &mut BTreeMap<Hand, Hand>) -> Vec<Hand>
                     };
                     let new_permutations = permutate_hand(&new_hand, seen);
                     let new_highest_hand = get_highest_hand(&new_permutations);
-                    hands.push(new_highest_hand.clone());
-                    let entry = seen.entry(new_hand).or_insert(new_highest_hand.clone());
-                    *entry = new_highest_hand.clone();
+                    hands.push(new_highest_hand);
+                    let entry = seen.entry(new_hand).or_insert(new_highest_hand);
+                    *entry = new_highest_hand;
                 }
             }
         }

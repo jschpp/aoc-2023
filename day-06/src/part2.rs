@@ -7,7 +7,6 @@ pub struct Race {
 impl Race {
     pub fn alternatives(&self) -> Vec<usize> {
         (1..self.time)
-            .into_iter()
             .map(|hold| (self.time - hold) * hold)
             .collect::<Vec<usize>>()
     }
