@@ -21,6 +21,9 @@ mod tests {
     #[case("pc-", 48)]
     #[case("pc=6", 214)]
     #[case("ot=7", 231)]
+    #[case("HASH", 52)]
+    #[case("rn", 0)]
+    #[case("qp", 1)]
     fn test_single_hash(#[case] input: String, #[case] expected: u32) {
         assert_eq!(my_hash(&input), expected);
     }
