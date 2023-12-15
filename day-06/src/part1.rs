@@ -33,7 +33,6 @@ pub fn my_parser(input: &str) -> IResult<&str, Vec<Race>> {
 impl Race {
     pub fn alternatives(&self) -> Vec<u32> {
         (1..self.time)
-            .into_iter()
             .map(|hold| (self.time - hold) * hold)
             .collect::<Vec<u32>>()
     }
