@@ -7,4 +7,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = { workspace = true }
+glam = "0.24.2"
 nom = { workspace = true }
+rstest = { workspace = true }
+toodee = "0.5.0"
