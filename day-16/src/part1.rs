@@ -1,41 +1,10 @@
 use super::shared::*;
 use glam::IVec2;
-use std::collections::{HashMap, VecDeque};
-use toodee::TooDee;
+use std::collections::VecDeque;
+use toodee::TooDeeOps;
 
 pub fn process(input: &str) -> String {
-    let mut rows: usize = 0;
-    let mut cols: usize = 0;
-    let tiles: HashMap<IVec2, Tile> = input
-        .lines()
-        .enumerate()
-        .flat_map(|(line_idx, line)| {
-            rows = rows.max(line_idx + 1);
-            line.chars()
-                .enumerate()
-                .map(|(c_idx, c)| {
-                    cols = cols.max(c_idx + 1);
-                    let pos = IVec2::new(c_idx as i32, line_idx as i32);
-                    (
-                        pos,
-                        Tile::new(
-                            pos,
-                            match c {
-                                '.' => None,
-                                val => Some(val),
-                            },
-                        ),
-                    )
-                })
-                .collect::<Vec<_>>()
-        })
-        .collect();
-    let mut grid: TooDee<Tile> = TooDee::new(cols, rows);
-    for x in 0..cols {
-        for y in 0..rows {
-            grid[x][y] = *tiles.get(&IVec2::new(x as i32, y as i32)).expect("exists")
-        }
-    }
+    let mut grid = parse_into_grid(input);
     // at this point my grid is ready to be traversed by light ^^'
     let mut work_queue: VecDeque<(IVec2, Direction)> = VecDeque::new();
     work_queue.push_back((IVec2::new(0, 0), Direction::East));
@@ -47,7 +16,7 @@ pub fn process(input: &str) -> String {
                     let x = new_pos.x as usize;
                     let y = new_pos.y as usize;
                     let new_direction: Direction = Direction::from_points(pos, new_pos);
-                    if x < cols && y < rows {
+                    if x < grid.num_cols() && y < grid.num_rows() {
                         work_queue.push_back((new_pos, new_direction))
                     }
                 }

@@ -1,5 +1,6 @@
 use glam::IVec2;
-use std::{fmt::Debug, ops::Add};
+use std::{collections::HashMap, fmt::Debug, ops::Add};
+use toodee::TooDee;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Direction {
@@ -119,6 +120,42 @@ impl Tile {
             }
         }
     }
+}
+
+pub fn parse_into_grid(input: &str) -> TooDee<Tile> {
+    let mut rows: usize = 0;
+    let mut cols: usize = 0;
+    let tiles: HashMap<IVec2, Tile> = input
+        .lines()
+        .enumerate()
+        .flat_map(|(line_idx, line)| {
+            rows = rows.max(line_idx + 1);
+            line.chars()
+                .enumerate()
+                .map(|(c_idx, c)| {
+                    cols = cols.max(c_idx + 1);
+                    let pos = IVec2::new(c_idx as i32, line_idx as i32);
+                    (
+                        pos,
+                        Tile::new(
+                            pos,
+                            match c {
+                                '.' => None,
+                                val => Some(val),
+                            },
+                        ),
+                    )
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    let mut grid: TooDee<Tile> = TooDee::new(cols, rows);
+    for x in 0..cols {
+        for y in 0..rows {
+            grid[x][y] = *tiles.get(&IVec2::new(x as i32, y as i32)).expect("exists")
+        }
+    }
+    grid
 }
 
 #[cfg(test)]
