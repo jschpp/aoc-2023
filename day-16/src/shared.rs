@@ -1,6 +1,9 @@
 use glam::IVec2;
-use std::collections::VecDeque;
-use std::{collections::HashMap, fmt::Debug, ops::Add};
+use std::{
+    collections::{HashMap, VecDeque},
+    fmt::Debug,
+    ops::Add,
+};
 use toodee::{TooDee, TooDeeOps};
 
 #[derive(Debug, Clone, Copy)]
