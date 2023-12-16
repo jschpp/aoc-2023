@@ -9,5 +9,6 @@ edition = "2021"
 anyhow = { workspace = true }
 glam = "0.24.2"
 nom = { workspace = true }
+rayon = "1.8.0"
 rstest = { workspace = true }
 toodee = "0.5.0"
