@@ -78,4 +78,10 @@ mod tests {
 ..//.|....";
         assert_eq!("46", process(input));
     }
+
+    #[test]
+    fn test_input() {
+        let input = include_str!("../input.txt");
+        assert_eq!("7498", process(input));
+    }
 }
