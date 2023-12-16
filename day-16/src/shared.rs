@@ -17,6 +17,21 @@ impl Add<Direction> for IVec2 {
     }
 }
 
+impl TryFrom<IVec2> for Direction {
+    type Error = &'static str;
+    fn try_from(value: IVec2) -> Result<Self, Self::Error> {
+        let value = value.clamp(IVec2 { x: -1, y: -1 }, IVec2 { x: 1, y: 1 });
+        match (value.x, value.y) {
+            (0, 0) => Err("did not move"),
+            (1, 0) => Ok(Direction::East),
+            (-1, 0) => Ok(Direction::West),
+            (0, 1) => Ok(Direction::South),
+            (0, -1) => Ok(Direction::North),
+            _ => Err("move not defined"),
+        }
+    }
+}
+
 impl From<Direction> for IVec2 {
     fn from(value: Direction) -> Self {
         match value {
@@ -33,23 +48,13 @@ impl Direction {
         self.into()
     }
 
+    /// Converts from two points into a Direction
+    ///
+    /// # panics
+    /// Will panic when trying to move diagonal or if `from==to`
     pub fn from_points(from: IVec2, to: IVec2) -> Self {
-        if !((from.x == to.x) ^ (from.y == to.y)) {
-            panic!("not supported for points that far apart")
-        }
-        let vertical: i32 = from.x - to.x;
-        let horizontal: i32 = from.y - to.y;
-        if vertical != 0 {
-            if vertical < 0 {
-                Direction::East
-            } else {
-                Direction::West
-            }
-        } else if horizontal < 0 {
-            Direction::South
-        } else {
-            Direction::North
-        }
+        let movement = to - from;
+        movement.try_into().unwrap()
     }
 }
 
