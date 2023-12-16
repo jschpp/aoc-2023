@@ -39,8 +39,8 @@ fn get_starting_positions(num_rows: i32, num_cols: i32) -> Vec<(IVec2, Direction
 pub fn process(input: &str) -> String {
     let grid = parse_into_grid(input);
     get_starting_positions(grid.num_rows() as i32, grid.num_cols() as i32)
-        .par_iter()
-        .map(|s| illuminate_grid(&mut grid.clone(), *s))
+        .into_par_iter()
+        .map(|s| illuminate_grid(&mut grid.clone(), s))
         .max()
         .expect("some result should exists")
         .to_string()
