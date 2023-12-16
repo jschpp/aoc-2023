@@ -1,29 +1,7 @@
 use super::shared::*;
 use glam::IVec2;
 use rayon::prelude::*;
-use std::collections::VecDeque;
-use toodee::{TooDee, TooDeeOps};
-
-fn illuminate_grid(grid: &mut TooDee<Tile>, start: (IVec2, Direction)) -> usize {
-    let mut work_queue: VecDeque<(IVec2, Direction)> = VecDeque::new();
-    work_queue.push_back(start);
-    while !work_queue.is_empty() {
-        let (pos, to) = work_queue.pop_front().expect("not empty yet");
-        if let Some(new_positions) = grid[pos.x as usize][pos.y as usize].pass(to) {
-            for new_pos in new_positions.into_iter() {
-                if new_pos.x >= 0 && new_pos.y >= 0 {
-                    let x = new_pos.x as usize;
-                    let y = new_pos.y as usize;
-                    let new_direction: Direction = Direction::from_points(pos, new_pos);
-                    if x < grid.num_cols() && y < grid.num_rows() {
-                        work_queue.push_back((new_pos, new_direction))
-                    }
-                }
-            }
-        }
-    }
-    grid.into_iter().filter(|tile| tile.illuminated).count()
-}
+use toodee::TooDeeOps;
 
 fn get_starting_positions(num_rows: i32, num_cols: i32) -> Vec<(IVec2, Direction)> {
     assert!(num_cols >= 0 && num_rows >= 0);

@@ -1,6 +1,7 @@
 use glam::IVec2;
+use std::collections::VecDeque;
 use std::{collections::HashMap, fmt::Debug, ops::Add};
-use toodee::TooDee;
+use toodee::{TooDee, TooDeeOps};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Direction {
@@ -163,6 +164,27 @@ pub fn parse_into_grid(input: &str) -> TooDee<Tile> {
         }
     }
     grid
+}
+
+pub fn illuminate_grid(grid: &mut TooDee<Tile>, start: (IVec2, Direction)) -> usize {
+    let mut work_queue: VecDeque<(IVec2, Direction)> = VecDeque::new();
+    work_queue.push_back(start);
+    while !work_queue.is_empty() {
+        let (pos, to) = work_queue.pop_front().expect("not empty yet");
+        if let Some(new_positions) = grid[pos.x as usize][pos.y as usize].pass(to) {
+            for new_pos in new_positions.into_iter() {
+                if new_pos.x >= 0 && new_pos.y >= 0 {
+                    let x = new_pos.x as usize;
+                    let y = new_pos.y as usize;
+                    let new_direction: Direction = Direction::from_points(pos, new_pos);
+                    if x < grid.num_cols() && y < grid.num_rows() {
+                        work_queue.push_back((new_pos, new_direction))
+                    }
+                }
+            }
+        }
+    }
+    grid.into_iter().filter(|tile| tile.illuminated).count()
 }
 
 #[cfg(test)]
