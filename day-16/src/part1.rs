@@ -1,15 +1,288 @@
-pub fn process(_input: &str) -> String {
-    todo!("day 01 - part 1");
+use glam::IVec2;
+use std::{
+    collections::{HashMap, VecDeque},
+    fmt::Debug,
+    ops::Add,
+};
+use toodee::TooDee;
+
+#[derive(Debug, Clone, Copy)]
+pub enum Direction {
+    North,
+    South,
+    East,
+    West,
+}
+
+impl Add<Direction> for IVec2 {
+    type Output = IVec2;
+    fn add(self, rhs: Direction) -> Self::Output {
+        self + Into::<IVec2>::into(rhs)
+    }
+}
+
+// impl Into<IVec2> for Direction {
+//     fn into(self) -> IVec2 {
+//         match self {
+//             Direction::North => return IVec2::new(0, -1),
+//             Direction::South => return IVec2::new(0, 1),
+//             Direction::East => return IVec2::new(1, 0),
+//             Direction::West => return IVec2::new(-1, 0),
+//         }
+
+//     }
+// }
+
+impl From<Direction> for IVec2 {
+    fn from(value: Direction) -> Self {
+        match value {
+            Direction::North => Self::new(0, -1),
+            Direction::South => Self::new(0, 1),
+            Direction::East => Self::new(1, 0),
+            Direction::West => Self::new(-1, 0),
+        }
+    }
+}
+
+impl Direction {
+    fn to_point(self) -> IVec2 {
+        self.into()
+    }
+
+    fn from_points(from: IVec2, to: IVec2) -> Self {
+        if !((from.x == to.x) ^ (from.y == to.y)) {
+            panic!("not supported for points that far apart")
+        }
+        let vertical: i32 = from.x - to.x;
+        let horizontal: i32 = from.y - to.y;
+        if vertical != 0 {
+            if vertical < 0 {
+                Direction::East
+            } else {
+                Direction::West
+            }
+        } else if horizontal < 0 {
+            Direction::South
+        } else {
+            Direction::North
+        }
+    }
+}
+
+#[derive(Clone, Copy, Default)]
+pub struct Tile {
+    pub position: IVec2,
+    pub mirror: Option<char>,
+    pub illuminated: bool,
+    passed: [bool; 4],
+}
+
+impl Debug for Tile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let c = self.mirror.unwrap_or('.');
+        write!(f, "{}", c)
+    }
+}
+
+impl Tile {
+    pub fn new(position: IVec2, mirror: Option<char>) -> Self {
+        Self {
+            position,
+            mirror,
+            passed: [false; 4],
+            illuminated: false,
+        }
+    }
+
+    pub fn pass(&mut self, to: Direction) -> Option<Vec<IVec2>> {
+        use Direction::*;
+        if self.passed[to as usize] {
+            return None;
+        }
+        self.passed[to as usize] = true;
+        self.illuminated = true;
+        if self.mirror.is_none() {
+            Some(vec![self.position + to.to_point()])
+        } else {
+            let mirror = self.mirror.expect("mirror is not None here");
+            match mirror {
+                '|' => match to {
+                    North | South => Some(vec![self.position + to]),
+                    East | West => Some(vec![
+                        self.position + North.to_point(),
+                        self.position + South.to_point(),
+                    ]),
+                },
+                '/' => match to {
+                    North => Some(vec![self.position + East]),
+                    South => Some(vec![self.position + West]),
+                    West => Some(vec![self.position + South]),
+                    East => Some(vec![self.position + North]),
+                },
+                '\\' => match to {
+                    North => Some(vec![self.position + West]),
+                    South => Some(vec![self.position + East]),
+                    West => Some(vec![self.position + North]),
+                    East => Some(vec![self.position + South]),
+                },
+                '-' => match to {
+                    North | South => Some(vec![
+                        self.position + East.to_point(),
+                        self.position + West.to_point(),
+                    ]),
+                    East | West => Some(vec![self.position + to]),
+                },
+                _ => unreachable!(),
+            }
+        }
+    }
+}
+
+pub fn process(input: &str) -> String {
+    let mut rows: usize = 0;
+    let mut cols: usize = 0;
+    let tiles: HashMap<IVec2, Tile> = input
+        .lines()
+        .enumerate()
+        .flat_map(|(line_idx, line)| {
+            rows = rows.max(line_idx + 1);
+            line.chars()
+                .enumerate()
+                .map(|(c_idx, c)| {
+                    cols = cols.max(c_idx + 1);
+                    let pos = IVec2::new(c_idx as i32, line_idx as i32);
+                    (
+                        pos,
+                        Tile::new(
+                            pos,
+                            match c {
+                                '.' => None,
+                                val => Some(val),
+                            },
+                        ),
+                    )
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    let mut grid: TooDee<Tile> = TooDee::new(cols, rows);
+    for x in 0..cols {
+        for y in 0..rows {
+            grid[x][y] = *tiles.get(&IVec2::new(x as i32, y as i32)).expect("exists")
+        }
+    }
+    // at this point my grid is ready to be traversed by light ^^'
+    let mut work_queue: VecDeque<(IVec2, Direction)> = VecDeque::new();
+    work_queue.push_back((IVec2::new(0, 0), Direction::East));
+    while !work_queue.is_empty() {
+        let (pos, to) = work_queue.pop_front().expect("not empty yet");
+        if let Some(new_positions) = grid[pos.x as usize][pos.y as usize].pass(to) {
+            for new_pos in new_positions.into_iter() {
+                if new_pos.x >= 0 && new_pos.y >= 0 {
+                    let x = new_pos.x as usize;
+                    let y = new_pos.y as usize;
+                    let new_direction: Direction = Direction::from_points(pos, new_pos);
+                    if x < cols && y < rows {
+                        work_queue.push_back((new_pos, new_direction))
+                    }
+                }
+            }
+        }
+    }
+    grid.into_iter()
+        .filter(|tile| tile.illuminated)
+        .count()
+        .to_string()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rstest::{fixture, rstest};
+
+    #[fixture]
+    fn tile(#[default(None)] mirror: Option<char>) -> Tile {
+        Tile::new(IVec2::new(0, 0), mirror)
+    }
+
+    #[rstest]
+    #[case::going_north(Direction::North, Some(vec![Direction::East.to_point(), Direction::West.to_point()]))]
+    #[case::going_south(Direction::South, Some(vec![Direction::East.to_point(), Direction::West.to_point()]))]
+    #[case::going_east(Direction::East, Some(vec![Direction::East.to_point()]))]
+    #[case::going_west(Direction::West, Some(vec![Direction::West.to_point()]))]
+    fn test_horizontal_mirror(
+        #[case] to: Direction,
+        #[with(Some('-'))] tile: Tile,
+        #[case] expected: Option<Vec<IVec2>>,
+    ) {
+        let mut tile: Tile = tile.clone();
+        assert_eq!(tile.pass(to), expected)
+    }
+
+    #[rstest]
+    #[case::going_north(Direction::North, Some(vec![Direction::North.to_point()]))]
+    #[case::going_south(Direction::South, Some(vec![Direction::South.to_point()]))]
+    #[case::going_east(Direction::East, Some(vec![Direction::North.to_point(), Direction::South.to_point()]))]
+    #[case::going_west(Direction::West, Some(vec![Direction::North.to_point(), Direction::South.to_point()]))]
+    fn test_vertical_mirror(
+        #[case] to: Direction,
+        #[with(Some('|'))] tile: Tile,
+        #[case] expected: Option<Vec<IVec2>>,
+    ) {
+        let mut tile: Tile = tile.clone();
+        assert_eq!(tile.pass(to), expected)
+    }
+
+    #[rstest]
+    #[case::going_north(Direction::North, Some(vec![Direction::East.to_point()]))]
+    #[case::going_south(Direction::South, Some(vec![Direction::West.to_point()]))]
+    #[case::going_east(Direction::East, Some(vec![Direction::North.to_point()]))]
+    #[case::going_west(Direction::West, Some(vec![Direction::South.to_point()]))]
+    fn test_slash_mirror(
+        #[case] to: Direction,
+        #[with(Some('/'))] tile: Tile,
+        #[case] expected: Option<Vec<IVec2>>,
+    ) {
+        let mut tile: Tile = tile.clone();
+        assert_eq!(tile.pass(to), expected)
+    }
+
+    #[rstest]
+    #[case::going_north(Direction::North, Some(vec![Direction::West.to_point()]))]
+    #[case::going_south(Direction::South, Some(vec![Direction::East.to_point()]))]
+    #[case::going_east(Direction::East, Some(vec![Direction::South.to_point()]))]
+    #[case::going_west(Direction::West, Some(vec![Direction::North.to_point()]))]
+    fn test_backslash_mirror(
+        #[case] to: Direction,
+        #[with(Some('\\'))] tile: Tile,
+        #[case] expected: Option<Vec<IVec2>>,
+    ) {
+        let mut tile: Tile = tile.clone();
+        assert_eq!(tile.pass(to), expected)
+    }
+
+    #[rstest]
+    #[case(Direction::North, 0)]
+    #[case(Direction::South, 1)]
+    #[case(Direction::East, 2)]
+    #[case(Direction::West, 3)]
+    fn test_enum_conversion(#[case] direction: Direction, #[case] expected: usize) {
+        // this is a sanity check since the order will matter for the future
+        assert_eq!(direction as usize, expected)
+    }
 
     #[test]
     fn test_process() {
-        todo!("haven't built test yet");
-        let input = "";
-        assert_eq!("", process(input));
+        let input = r".|...\....
+|.-.\.....
+.....|-...
+........|.
+..........
+.........\
+..../.\\..
+.-.-/..|..
+.|....-|.\
+..//.|....";
+        assert_eq!("46", process(input));
     }
 }
