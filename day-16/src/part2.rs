@@ -38,8 +38,8 @@ fn get_starting_positions(num_rows: i32, num_cols: i32) -> Vec<(IVec2, Direction
         (IVec2::new(max_col_idx, 0), Direction::South),
         (IVec2::new(0, max_row_idx), Direction::East),
         (IVec2::new(0, max_row_idx), Direction::North),
-        (IVec2::new(max_col_idx, 0), Direction::West),
-        (IVec2::new(max_col_idx, 0), Direction::North),
+        (IVec2::new(max_col_idx, max_row_idx), Direction::West),
+        (IVec2::new(max_col_idx, max_row_idx), Direction::North),
     ];
 
     // left & right edges
