@@ -83,6 +83,14 @@ impl Tile {
         }
     }
 
+    /// will try to pass the Tile into the given `to` direction
+    ///
+    /// Sets `self.illuminated` to `true`
+    ///
+    /// matches on the tiles mirror (if any) to get the next positions
+    ///
+    /// returns `None` if the tile was already visited by a light
+    /// beam going into the same direction
     pub fn pass(&mut self, to: Direction) -> Option<Vec<IVec2>> {
         use Direction::*;
         if self.passed[to as usize] {
@@ -91,16 +99,13 @@ impl Tile {
         self.passed[to as usize] = true;
         self.illuminated = true;
         if self.mirror.is_none() {
-            Some(vec![self.position + to.to_point()])
+            Some(vec![self.position + to])
         } else {
             let mirror = self.mirror.expect("mirror is not None here");
             match mirror {
                 '|' => match to {
                     North | South => Some(vec![self.position + to]),
-                    East | West => Some(vec![
-                        self.position + North.to_point(),
-                        self.position + South.to_point(),
-                    ]),
+                    East | West => Some(vec![self.position + North, self.position + South]),
                 },
                 '/' => match to {
                     North => Some(vec![self.position + East]),
@@ -115,10 +120,7 @@ impl Tile {
                     East => Some(vec![self.position + South]),
                 },
                 '-' => match to {
-                    North | South => Some(vec![
-                        self.position + East.to_point(),
-                        self.position + West.to_point(),
-                    ]),
+                    North | South => Some(vec![self.position + East, self.position + West]),
                     East | West => Some(vec![self.position + to]),
                 },
                 _ => unreachable!(),
